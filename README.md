@@ -12,7 +12,7 @@ sudo ./pimpmykali.sh
 2. Setup.sh
 ```
 cd /root; mkdir lab; cd lab
-wget setup.sh; chmod +x setup.sh
+git clone https://github.com/chsoares/kali_setup.git
 ./setup.sh
 ```
 
