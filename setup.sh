@@ -5,10 +5,10 @@ xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s wallpa
 
 ## Move transfer folder to /opt/
 mkdir /opt/_transfer
-mv ./transfer/* /opt/_transfer/
+mv -r transfer/. /opt/_transfer/
 
 ## Move .zsh stuff to ~
-mv ./zsh/* /root/
+mv -r zsh/. /root/
 
 ## Download tools
 
