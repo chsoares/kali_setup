@@ -56,9 +56,6 @@ alias bloodhound='neo4j start; bloodhound'
 ## sstiMap
 alias sstimap='/opt/SSTImap/sstimap.py -i'
 
-## XXEinjector
-alias xxei='ruby /opt/XXEinjector/XXEinjector.rb'
-
 ## wordlists
 export rockyou='/usr/share/wordlists/rockyou.txt'
 export directory='/usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'
