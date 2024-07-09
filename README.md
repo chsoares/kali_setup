@@ -4,7 +4,7 @@
 ```
 cd /opt
 rm -rf pimpmykali/
-git clone https://github.com/Dewalt-arch/pimpmykali
+sudo git clone https://github.com/Dewalt-arch/pimpmykali
 cd pimpmykali
 sudo ./pimpmykali.sh
 ```
