@@ -25,7 +25,7 @@ assemble() {
 }
 
 ## Ligolo
-alias ligolo='/opt/ligolo/proxy -selfcert'
+alias ligolo='/opt/ligolo-ng/proxy -selfcert'
 
 ligtun() {
     ip tuntap add user root mode tun "$1"
