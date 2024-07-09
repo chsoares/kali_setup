@@ -38,6 +38,7 @@ cd ligolo-ng
 go build -o agent cmd/agent/main.go
 go build -o proxy cmd/proxy/main.go
 GOOS=windows go build -o agent.exe cmd/agent/main.go
+cp agent agent.exe /opt/_transfer 
 
 #SSTImap
 cd /opt/
