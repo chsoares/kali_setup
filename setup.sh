@@ -13,7 +13,7 @@ mv -r zsh/. /root/
 ## Download tools
 
 #Burp
-cd /root/lab
+cd /root/lab/kali_setup
 wget -O 'burp_downloader.sh' 'https://portswigger-cdn.net/burp/releases/download?product=pro&type=Linux'
 chmod +x burp_downloader.sh burp_patcher.sh
 ./burp_downloader.sh
