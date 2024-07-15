@@ -45,7 +45,7 @@ ligdel() {
 alias lab='cd ~/lab'
 
 ## http server
-alias server='cd /opt/_transfer; ls; python3 -m http.server 80'
+alias server='cd /opt/transfer; ls; python3 -m http.server 80'
 
 ## fping
 alias fping='fping -agq'
@@ -59,3 +59,4 @@ alias sstimap='/opt/SSTImap/sstimap.py -i'
 ## wordlists
 export rockyou='/usr/share/wordlists/rockyou.txt'
 export directory='/usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'
+export usernames='/usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames.txt'
