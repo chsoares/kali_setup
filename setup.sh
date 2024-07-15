@@ -52,3 +52,10 @@ chmod +x ezpz.sh
 
 #Creds
 pip3 install defaultcreds-cheat-sheet
+
+## Fix Rockyou
+cd /usr/share/wordlists
+mv rockyou.txt rockyou_old.txt
+iconv -f ISO-8859-1 -t UTF-8 rockyou_old.txt > rockyou.txt
+rm rockyou_old.txt
+
