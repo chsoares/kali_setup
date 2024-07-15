@@ -4,8 +4,8 @@
 xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s wallpaper.jpg
 
 ## Move transfer folder to /opt/
-mkdir /opt/_transfer
-mv -r transfer/. /opt/_transfer/
+mkdir /opt/transfer
+mv -r transfer/. /opt/transfer/
 
 ## Move .zsh stuff to ~
 mv -r zsh/. /root/
@@ -27,9 +27,7 @@ make install
 
 #Kerbrute
 cd /opt/
-go get github.com/ropnop/kerbrute
-cd kerbrute
-make all
+go install github.com/ropnop/kerbrute@latest
 
 #Ligolo
 cd /opt/
@@ -38,7 +36,7 @@ cd ligolo-ng
 go build -o agent cmd/agent/main.go
 go build -o proxy cmd/proxy/main.go
 GOOS=windows go build -o agent.exe cmd/agent/main.go
-cp agent agent.exe /opt/_transfer 
+cp agent agent.exe /opt/transfer 
 
 #SSTImap
 cd /opt/
