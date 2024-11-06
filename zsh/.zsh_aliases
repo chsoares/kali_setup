@@ -12,6 +12,7 @@ rdp() {
 cleanup() {
     head -n 5 /etc/hosts > /etc/tmp && mv /etc/tmp /etc/hosts
     rm -f ~/lab/* 2>/dev/null
+    echo "" > ~/.zsh_env
 }
 
 ## ASM
@@ -62,12 +63,33 @@ mkcd() {
     mkdir $1; cd $1
 }
 
+## start box
+start() {
+    boxname=$1
+    boxip=$2
+ 
+    echo "box=$boxname" > ~/.zsh_env
+    echo "ip=$boxip" >> ~/.zsh_env
+    
+    cd ~/lab
+    mkdir $boxname
+    cd $boxname
+    
+    echo "[*] Created directory at ~/lab/$boxname"
+    echo "[!] Env \$box is now $boxname"
+    echo "[!] Env \$ip is now $boxip"
+}
+
+
+
 #---------
 # ALIASES
 #---------
 
 ## lab
 alias lab='cd ~/lab'
+alias box="cd ~/lab/$box"
+alias zshenv='mousepad ~/.zsh_env'
 
 ## http server
 alias transfer='cd /opt/transfer; ls; python3 -m http.server 80'
