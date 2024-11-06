@@ -11,7 +11,7 @@ rdp() {
 ## cleanup
 cleanup() {
     head -n 5 /etc/hosts > /etc/tmp && mv /etc/tmp /etc/hosts
-    rm -rf ~/lab/*
+    rm -f ~/lab/* 2>/dev/null
 }
 
 ## ASM
@@ -57,6 +57,10 @@ addhost() {
     grep "^$ip" /etc/hosts
 }
 
+## mkdir cd
+mkcd() {
+    mkdir $1; cd $1
+}
 
 #---------
 # ALIASES
@@ -73,7 +77,7 @@ alias www='ls; python3 -m http.server 80'
 #alias fping='fping -agq'
 
 ## bloodhound
-alias bloodhound='neo4j start; bloodhound'
+alias bloodhound='cd /opt/bloodhound; docker-compose up -d; firefox localhost:8080'
 
 ## sstiMap
 alias sstimap='/opt/SSTImap/sstimap.py -i'
