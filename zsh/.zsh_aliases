@@ -13,6 +13,7 @@ cleanup() {
     head -n 5 /etc/hosts > /etc/tmp && mv /etc/tmp /etc/hosts
     rm -f ~/lab/* 2>/dev/null
     echo "" > ~/.zsh_env
+    ntpdate a.st1.ntp.br
 }
 
 ## ASM
@@ -74,10 +75,12 @@ start() {
     cd ~/lab
     mkdir $boxname
     cd $boxname
+    ntpdate $ip
     
     echo "[*] Created directory at ~/lab/$boxname"
     echo "[!] Env \$box is now $boxname"
     echo "[!] Env \$ip is now $boxip"
+    echo "[!] Time is now sync'd with target box."
 }
 
 
