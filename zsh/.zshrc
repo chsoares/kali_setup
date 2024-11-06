@@ -201,6 +201,9 @@ xterm*|rxvt*|Eterm|aterm|kterm|gnome*|alacritty)
 esac
 
 precmd() {
+    # Source box variables -- CUSTOM SHIT DELETE THIS MAYBE
+    . ~/.zsh_env 2>/dev/null
+
     # Print the previously configured title
     print -Pnr -- "$TERM_TITLE"
 
@@ -263,6 +266,8 @@ export PATH=$PATH:$GOPATH/bin
 export PATH=$HOME/.local/bin:$PATH
 
 # CUSTOM SHIT
-source /root/scripts/ezpz.sh
+source /opt/ezpz/ezpz.sh
 source /root/.zsh_aliases
 bash -c "setxkbmap -model abnt2 -layout br"
+
+#PROMPT_COMMAND='. ~/.zsh_env'
