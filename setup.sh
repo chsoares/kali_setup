@@ -59,3 +59,11 @@ mv rockyou.txt rockyou_old.txt
 iconv -f ISO-8859-1 -t UTF-8 rockyou_old.txt > rockyou.txt
 rm rockyou_old.txt
 
+## PIPX
+pipx install bloodyAD
+pipx install autobloody
+pipx install autorecon
+pipx install certipy
+pipx install impacket
+pipx install netexec
+
