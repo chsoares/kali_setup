@@ -65,5 +65,5 @@ pipx install autobloody
 pipx install autorecon
 pipx install certipy
 pipx install impacket
-pipx install netexec
+pipx install git+https://github.com/Pennyw0rth/NetExec
 
