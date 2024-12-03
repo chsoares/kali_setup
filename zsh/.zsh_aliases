@@ -10,10 +10,12 @@ rdp() {
 
 ## cleanup
 cleanup() {
-    head -n 5 /etc/hosts > /etc/tmp && mv /etc/tmp /etc/hosts
-    rm -f ~/lab/* 2>/dev/null
-    echo "" > ~/.zsh_env
-    ntpdate a.st1.ntp.br
+    cd ~/lab
+    mv "$boxpwd" "$box"
+    head -n 6 /etc/hosts > /etc/tmp && mv /etc/tmp /etc/hosts
+    #rm -f ~/lab/*
+    echo "" > ~/.zsh_env 
+    ntpdate a.st1.ntp.br > /dev/null 2>&1
 }
 
 ## ASM
@@ -32,7 +34,14 @@ alias ligolo='/opt/ligolo-ng/proxy -selfcert'
 ligtun() {
     ip tuntap add user root mode tun "$1"
     ip link set "$1" up
-    ip route add "$2" dev "$1" 
+    ip route add "$2" dev "$1"
+    ip route add 240.0.0.1/32 dev "$1" 
+}
+
+liglocal() {
+    ip tuntap add user root mode tun "$1"
+    ip link set "$1" up
+    ip route add 240.0.0.1/32 dev "$1" 
 }
 
 ligdel() {
@@ -50,13 +59,13 @@ addhost() {
     hostname="$2"
     if grep -q "^$ip" /etc/hosts; then
       sudo sed -i "/^$ip/s/$/ $hostname/" /etc/hosts
-      echo "[+] Appended $hostname to existing entry for $ip in /etc/hosts"
+      echo "\033[0;36m[*]\033[0m Appended \033[0;33m$hostname\033[0m to existing entry for \033[0;33m$ip\033[0m in /etc/hosts"
     else
-      echo "$ip $hostname" | sudo tee -a /etc/hosts > /dev/null
-      echo "[+] Added new entry: $ip $hostname to /etc/hosts"
+      echo "$ip    $hostname" | sudo tee -a /etc/hosts > /dev/null
+      echo "\033[0;36m[*]\033[0m Added new entry \033[0;33m$ip $hostname\033[0m to /etc/hosts"
     fi
 
-    grep "^$ip" /etc/hosts
+    grep "^$ip" /etc/hosts --color=never
 }
 
 ## mkdir cd
@@ -68,31 +77,62 @@ mkcd() {
 start() {
     boxname=$1
     boxip=$2
- 
+    
+    echo ""
+    
+    echo "\033[0;36m[*]\033[0m Created directory at \033[0;33m~/lab/$boxname\033[0m"
+    cd ~/lab; mkdir 0_$boxname 2>/dev/null; cd 0_$boxname
+    
+    echo ""
+    
     echo "box=$boxname" > ~/.zsh_env
     echo "ip=$boxip" >> ~/.zsh_env
+    echo "host=$boxname.htb" >> ~/.zsh_env
+    echo "url=http://$boxname.htb" >> ~/.zsh_env
+    echo "boxpwd=$(pwd)" >> ~/.zsh_env
+             
+    echo "\033[0;36m[*]\033[0m \033[0;33m\$ip \033[0mis set to $boxip"
+    echo "\033[0;36m[*]\033[0m \033[0;33m\$box \033[0mis set to $boxname"    
+    echo "\033[0;36m[*]\033[0m \033[0;33m\$url \033[0mis set to http://$boxname.htb"
     
-    cd ~/lab
-    mkdir $boxname
-    cd $boxname
-    ntpdate $ip
+    echo ""
+        
+    addhost $boxip $boxname.htb 
     
-    echo "[*] Created directory at ~/lab/$boxname"
-    echo "[!] Env \$box is now $boxname"
-    echo "[!] Env \$ip is now $boxip"
-    echo "[!] Time is now sync'd with target box."
+    echo ""
+    
+    echo "\033[0;36m[*]\033[0m Trying to sync time with target box"
+    ntpdate $ip #2>/dev/null
+       
+    echo ""
+    echo "\033[1;33mHappy hacking! :) \033[0m"
 }
 
+## ZSH_ENV
 
+zshenv() {
+    if [[ $# -eq 0 ]]; then
+        cat ~/.zsh_env
+    elif [[ $1 == "set" ]]; then
+        shift 
+        echo "$@" >> ~/.zsh_env
+    elif [[ $1 == "edit" ]]; then
+        mousepad ~/.zsh_env
+    else
+        echo "Invalid command. Use 'set', 'edit', or no arguments to print current envs."
+    fi
+}
 
 #---------
 # ALIASES
 #---------
 
-## lab
+## explorer
 alias lab='cd ~/lab'
-alias box="cd ~/lab/$box"
-alias zshenv='mousepad ~/.zsh_env'
+alias box='cd $boxpwd'
+alias oldpwd='cd $OLDPWD'
+#setenv() { echo "$@" >> ~/.zsh_env }
+#alias zshenv='mousepad ~/.zsh_env'
 
 ## http server
 alias transfer='cd /opt/transfer; ls; python3 -m http.server 80'
@@ -102,7 +142,7 @@ alias www='ls; python3 -m http.server 80'
 #alias fping='fping -agq'
 
 ## bloodhound
-alias bloodhound='cd /opt/bloodhound; docker-compose up -d; firefox localhost:8080'
+alias bloodhound='cd /opt/BloodHound; docker-compose up -d; sleep 2; firefox localhost:8080'
 
 ## sstiMap
 alias sstimap='/opt/SSTImap/sstimap.py -i'
@@ -111,6 +151,8 @@ alias sstimap='/opt/SSTImap/sstimap.py -i'
 export rockyou='/usr/share/wordlists/rockyou.txt'
 export directory='/usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'
 export usernames='/usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames.txt'
+export subdomains='/usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt'
+export weblist='/usr/share/seclists/Discovery/weblist-chsoares.txt'
 
 ## tty
 pytty () {
@@ -125,3 +167,19 @@ alias fixtty='stty raw -echo; fg; reset'
 
 ## phpcmd
 alias phpcmd='echo "<?=\`\$_GET[0]\`?>" > cmd.php && echo "[+] Wrote <?=\`\$_GET[0]\`?> in cmd.php"'
+
+## autorecon no dirb
+alias autorecon='autorecon $ip --global.domain $host --exclude-tags=dirbuster'
+
+
+## sqlmap
+#alias sqlmap='sqlmap --batch --threads 10 --level 5'
+
+## aliases
+alias aliases='mousepad ~/.zsh_aliases'
+
+## unicorn
+alias unicorn='/opt/unicorn/unicorn.py'
+
+## codium
+alias codium='codium --no-sandbox --user-data-dir /home/kali'
