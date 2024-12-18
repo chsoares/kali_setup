@@ -11,10 +11,11 @@ rdp() {
 ## cleanup
 cleanup() {
     cd ~/lab
-    mv "$boxpwd" "$box"
+    mv $boxpwd ~/lab/$box 2>/dev/null
+    sed -i 's/0_//g' ~/lab/$box/$box.zsh
     head -n 6 /etc/hosts > /etc/tmp && mv /etc/tmp /etc/hosts
     #rm -f ~/lab/*
-    echo "" > ~/.zsh_env 
+    cat /dev/null > ~/.zsh_env 
     ntpdate a.st1.ntp.br > /dev/null 2>&1
 }
 
@@ -85,19 +86,23 @@ start() {
     
     echo ""
     
-    echo "box=$boxname" > ~/.zsh_env
-    echo "ip=$boxip" >> ~/.zsh_env
-    echo "host=$boxname.htb" >> ~/.zsh_env
-    echo "url=http://$boxname.htb" >> ~/.zsh_env
-    echo "boxpwd=$(pwd)" >> ~/.zsh_env
-             
-    echo "\033[0;36m[*]\033[0m \033[0;33m\$ip \033[0mis set to $boxip"
-    echo "\033[0;36m[*]\033[0m \033[0;33m\$box \033[0mis set to $boxname"    
-    echo "\033[0;36m[*]\033[0m \033[0;33m\$url \033[0mis set to http://$boxname.htb"
+    echo "kali=$(ip a | grep tun0 | grep -oE "[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*")" > ./$boxname.zsh
+    echo "box=$boxname" >> ./$boxname.zsh
+    echo "ip=$boxip" >> ./$boxname.zsh
+    #echo "host=$boxname.htb" >> ./$boxname.zsh
+    echo "url=http://$boxname.htb" >> ./$boxname.zsh
+    echo "boxpwd=$(pwd)" >> ./$boxname.zsh
     
+    cat ./$boxname.zsh > ~/.zsh_env
+    source ~/.zsh_env
+             
+    echo "\033[0;36m[*]\033[0m \033[0;33m\$kali \033[0mis set to $(echo $kali)"
+    echo "\033[0;36m[*]\033[0m \033[0;33m\$ip \033[0mis set to $boxip"
+    echo "\033[0;36m[*]\033[0m \033[0;33m\$box \033[0mis set to $box"    
+    echo "\033[0;36m[*]\033[0m \033[0;33m\$url \033[0mis set to http://$box.htb"
     echo ""
         
-    addhost $boxip $boxname.htb 
+    addhost $ip $box.htb 
     
     echo ""
     
@@ -113,13 +118,25 @@ start() {
 zshenv() {
     if [[ $# -eq 0 ]]; then
         cat ~/.zsh_env
-    elif [[ $1 == "set" ]]; then
+    elif [[ $1 == "add" ]]; then
         shift 
-        echo "$@" >> ~/.zsh_env
+        echo "$@" >> $boxpwd/$box.zsh
+        cat $boxpwd/$box.zsh > ~/.zsh_env
     elif [[ $1 == "edit" ]]; then
-        mousepad ~/.zsh_env
+        mousepad $boxpwd/$box.zsh
+        cat $boxpwd/$box.zsh > ~/.zsh_env
+    elif [[ $1 == "set" ]]; then
+        shift
+        cat $1 > ~/.zsh_env
+        source ~/.zsh_env
+        echo "\033[0;36m[*]\033[0m \033[0;33m\$kali \033[0mis set to $(echo $kali)"
+        echo "\033[0;36m[*]\033[0m \033[0;33m\$ip \033[0mis set to $boxip"
+        echo "\033[0;36m[*]\033[0m \033[0;33m\$box \033[0mis set to $box"    
+        echo "\033[0;36m[*]\033[0m \033[0;33m\$url \033[0mis set to http://$box.htb"
+        addhost $ip $box.htb
+        ntpdate $ip 2>/dev/null
     else
-        echo "Invalid command. Use 'set', 'edit', or no arguments to print current envs."
+        echo "Invalid command. Use 'set', 'edit' or 'add' -- or no arguments to print current envs."
     fi
 }
 
@@ -128,6 +145,7 @@ zshenv() {
 #---------
 
 ## explorer
+alias hosts='mousepad /etc/hosts'
 alias lab='cd ~/lab'
 alias box='cd $boxpwd'
 alias oldpwd='cd $OLDPWD'
