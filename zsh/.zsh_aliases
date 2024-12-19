@@ -3,81 +3,15 @@
 # FUNCTIONS
 #-----------
 
-## xfreerdp
-rdp() {
-    xfreerdp /u:"$1" /p:"$2" /v:"$3" /cert:ignore /dynamic-resolution
-}
-
-## cleanup
-cleanup() {
-    cd ~/lab
-    mv $boxpwd ~/lab/$box 2>/dev/null
-    sed -i 's/0_//g' ~/lab/$box/$box.zsh
-    head -n 6 /etc/hosts > /etc/tmp && mv /etc/tmp /etc/hosts
-    #rm -f ~/lab/*
-    cat /dev/null > ~/.zsh_env 
-    ntpdate a.st1.ntp.br > /dev/null 2>&1
-}
-
-## ASM
-assemble() {
-    fileName="${1%%.*}"
-    nasm -f elf64 ${fileName}".s"
-    ld ${fileName}".o" -o bin_${fileName} -lc --dynamic-linker /lib64/ld-linux-x86-64.so.2
-    rm ${fileName}.o
-    [ "$2" == "-d" ] && gdb -q bin_${fileName}
-    [ "$1" == "-r" ] && ./bin_${fileName}
-}
-
-## Ligolo
-alias ligolo='/opt/ligolo-ng/proxy -selfcert'
-
-ligtun() {
-    ip tuntap add user root mode tun "$1"
-    ip link set "$1" up
-    ip route add "$2" dev "$1"
-    ip route add 240.0.0.1/32 dev "$1" 
-}
-
-liglocal() {
-    ip tuntap add user root mode tun "$1"
-    ip link set "$1" up
-    ip route add 240.0.0.1/32 dev "$1" 
-}
-
-ligdel() {
-    ip tuntap del mode tun "$1"
-}
-
-# Hosts
-addhost() {
-    if [ "$#" -ne 2 ]; then
-      echo "[i] Usage: addhost <ip> <hostname>"
-      return 1
-    fi
-
-    ip="$1"
-    hostname="$2"
-    if grep -q "^$ip" /etc/hosts; then
-      sudo sed -i "/^$ip/s/$/ $hostname/" /etc/hosts
-      echo "\033[0;36m[*]\033[0m Appended \033[0;33m$hostname\033[0m to existing entry for \033[0;33m$ip\033[0m in /etc/hosts"
-    else
-      echo "$ip    $hostname" | sudo tee -a /etc/hosts > /dev/null
-      echo "\033[0;36m[*]\033[0m Added new entry \033[0;33m$ip $hostname\033[0m to /etc/hosts"
-    fi
-
-    grep "^$ip" /etc/hosts --color=never
-}
-
-## mkdir cd
-mkcd() {
-    mkdir $1; cd $1
-}
-
 ## start box
 start() {
     boxname=$1
     boxip=$2
+     
+    if [[ -z "$boxname" || -z "$boxip" ]]; then
+        echo "[!] Usage: start <boxname> <boxip>"
+        return 1
+    fi
     
     echo ""
     
@@ -140,30 +74,77 @@ zshenv() {
     fi
 }
 
+# Hosts
+addhost() {
+    if [ "$#" -ne 2 ]; then
+      echo "[i] Usage: addhost <ip> <hostname>"
+      return 1
+    fi
+
+    local ip="$1"
+    local hostname="$2"
+    if grep -q "^$ip" /etc/hosts; then
+      sudo sed -i "/^$ip/s/$/ $hostname/" /etc/hosts
+      echo "\033[0;36m[*]\033[0m Appended \033[0;33m$hostname\033[0m to existing entry for \033[0;33m$ip\033[0m in /etc/hosts"
+    else
+      echo "$ip    $hostname" | sudo tee -a /etc/hosts > /dev/null
+      echo "\033[0;36m[*]\033[0m Added new entry \033[0;33m$ip $hostname\033[0m to /etc/hosts"
+    fi
+
+    grep "^$ip" /etc/hosts --color=never
+}
+
+## cleanup
+cleanup() {
+    cd ~/lab
+    mv $boxpwd ~/lab/$box 2>/dev/null
+    sed -i 's/0_//g' ~/lab/$box/$box.zsh
+    head -n 6 /etc/hosts > /etc/tmp && mv /etc/tmp /etc/hosts
+    #rm -f ~/lab/*
+    cat /dev/null > ~/.zsh_env 
+    ntpdate a.st1.ntp.br > /dev/null 2>&1
+}
+
+## Ligolo
+alias ligolo='/opt/ligolo-ng/proxy -selfcert'
+
+ligtun() {
+    ip tuntap add user root mode tun "$1"
+    ip link set "$1" up
+    ip route add "$2" dev "$1"
+    ip route add 240.0.0.1/32 dev "$1" 
+}
+
+liglocal() {
+    ip tuntap add user root mode tun "$1"
+    ip link set "$1" up
+    ip route add 240.0.0.1/32 dev "$1" 
+}
+
+ligdel() {
+    ip tuntap del mode tun "$1"
+}
+
+
+## mkdir cd
+mkcd() {
+    mkdir $1; cd $1
+}
+
+## dedup
+dedup() {
+    sort -u "$1" -o "$1"
+}
+
+## xfreerdp
+rdp() {
+    xfreerdp /u:"$1" /p:"$2" /v:"$3" /cert:ignore /dynamic-resolution
+}
+
+
 #---------
 # ALIASES
 #---------
-
-## explorer
-alias hosts='mousepad /etc/hosts'
-alias lab='cd ~/lab'
-alias box='cd $boxpwd'
-alias oldpwd='cd $OLDPWD'
-#setenv() { echo "$@" >> ~/.zsh_env }
-#alias zshenv='mousepad ~/.zsh_env'
-
-## http server
-alias transfer='cd /opt/transfer; ls; python3 -m http.server 80'
-alias www='ls; python3 -m http.server 80'
-
-## fping
-#alias fping='fping -agq'
-
-## bloodhound
-alias bloodhound='cd /opt/BloodHound; docker-compose up -d; sleep 2; firefox localhost:8080'
-
-## sstiMap
-alias sstimap='/opt/SSTImap/sstimap.py -i'
 
 ## wordlists
 export rockyou='/usr/share/wordlists/rockyou.txt'
@@ -171,6 +152,25 @@ export directory='/usr/share/wordlists/seclists/Discovery/Web-Content/directory-
 export usernames='/usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames.txt'
 export subdomains='/usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt'
 export weblist='/usr/share/seclists/Discovery/weblist-chsoares.txt'
+
+## explorer
+alias hosts='mousepad /etc/hosts'
+alias lab='cd ~/lab'
+alias box='cd $boxpwd'
+alias oldpwd='cd $OLDPWD'
+alias clearhosts='head -n 6 /etc/hosts > /etc/tmp && mv /etc/tmp /etc/hosts'
+#setenv() { echo "$@" >> ~/.zsh_env }
+#alias zshenv='mousepad ~/.zsh_env'
+
+## http server
+alias transfer='cd /opt/transfer; ls; python3 -m http.server 80'
+alias www='ls; python3 -m http.server 80'
+
+## bloodhound
+alias bloodhound='cd /opt/BloodHound; docker-compose up -d; sleep 2; firefox localhost:8080'
+
+## sstiMap
+alias sstimap='/opt/SSTImap/sstimap.py -i'
 
 ## tty
 pytty () {
@@ -180,7 +180,7 @@ pytty () {
 scriptty() {
     echo '/usr/bin/script -qc /bin/bash /dev/null'| xclip -sel clip
     echo "[+] Command copied to clipboard!"
- }
+}
 alias fixtty='stty raw -echo; fg; reset'
 
 ## phpcmd
@@ -188,7 +188,6 @@ alias phpcmd='echo "<?=\`\$_GET[0]\`?>" > cmd.php && echo "[+] Wrote <?=\`\$_GET
 
 ## autorecon no dirb
 alias autorecon='autorecon $ip --global.domain $host --exclude-tags=dirbuster'
-
 
 ## sqlmap
 #alias sqlmap='sqlmap --batch --threads 10 --level 5'
@@ -200,4 +199,4 @@ alias aliases='mousepad ~/.zsh_aliases'
 alias unicorn='/opt/unicorn/unicorn.py'
 
 ## codium
-alias codium='codium --no-sandbox --user-data-dir /home/kali'
+alias code='code --no-sandbox --user-data-dir /home/kali'
