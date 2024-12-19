@@ -46,9 +46,8 @@ pip3 install -r requirements.txt
 
 #EZPZ
 cd /opt/
-mkdir ezpz; cd ezpz
-wget https://github.com/chsoares/ezpz/raw/main/ezpz.sh
-chmod +x ezpz.sh
+git clone https://github.com/chsoares/ezpz.git
+cd ezpz; chmod +x ezpz.sh
 
 #Creds
 pip3 install defaultcreds-cheat-sheet
