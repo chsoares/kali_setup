@@ -267,7 +267,9 @@ export PATH=$HOME/.local/bin:$PATH
 
 # CUSTOM SHIT
 source /opt/ezpz/ezpz.sh
+#source /opt/ezpz/ezpz_cme.sh
 source /root/.zsh_aliases
 bash -c "setxkbmap -model abnt2 -layout br"
 
 #PROMPT_COMMAND='. ~/.zsh_env'
+source ~/.zsh_env
