@@ -105,6 +105,12 @@ cleanup() {
     ntpdate a.st1.ntp.br > /dev/null 2>&1
 }
 
+## Crack
+crack() {
+    echo $1 >> crack.hash
+    john -w=$rockyou --format=${2:-*} crack.hash
+}
+
 ## Ligolo
 alias ligolo='/opt/ligolo-ng/proxy -selfcert'
 
@@ -200,3 +206,6 @@ alias unicorn='/opt/unicorn/unicorn.py'
 
 ## codium
 alias code='code --no-sandbox --user-data-dir /home/kali'
+
+## penelope
+alias penelope='/opt/penelope/penelope.py -i tun0'
